@@ -23,6 +23,7 @@ if( !function_exists("fwb_redirect_to_landing") ){
                 if( !current_user_can( 'administrator' ) && !is_admin() ){
                     //to do - redirect 301 
                     //-redirect 302
+                    //
                     // do the redirect 
                     header( "Location: ". $redirecturl_option );
                     // exit to stop execution after header()
