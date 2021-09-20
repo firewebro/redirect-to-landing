@@ -16,13 +16,14 @@ if( !function_exists("fwb_redirect_to_landing") ){
 	function fwb_redirect_to_landing(){
         $enableredirect_option = get_option('fwb_redirect_to_landing_enable', false);
         $redirecturl_option = get_option('fwb_redirect_to_landing_url', false);
+        $redirecttype_option = get_option( 'fwb_redirect_type', 302 );
         // verify redirecturl against post_name to avoit a redirection loop, possible more bugs here
         if( !strpos($redirecturl_option, get_post_field('post_name', get_post())) ) {
             if( $enableredirect_option && strlen($redirecturl_option) > 10 ) {
                 // admins are not redirected
                 if( !current_user_can( 'administrator' ) && !is_admin() ){
                     // do the redirect 
-                    header( "Location: ". $redirecturl_option );
+                    header( "Location: ". $redirecturl_option, true, $redirecttype_option );
                     // exit to stop execution after header()
                     die();
                 }
@@ -67,10 +68,16 @@ function fwb_redirect_to_landing_init() {
             delete_option('fwb_redirect_to_landing_url');
             add_option('fwb_redirect_to_landing_url', esc_url_raw($_POST['redirecturl']), '', 'yes' );
         }
+        //redirect type option
+        if( isset($_POST['redirecttype']) ){
+            delete_option('fwb_redirect_type');
+            add_option('fwb_redirect_type', $_POST['redirecttype'], '', 'yes' );
+        }
     }
 
     $enableredirect_option = get_option('fwb_redirect_to_landing_enable', false);
     $redirecturl_option = get_option('fwb_redirect_to_landing_url', false);
+    $redirecttype_option = get_option( 'fwb_redirect_type', false );
 
     echo '<form method="post" action=""> 
     <table class="form-table">
@@ -78,6 +85,16 @@ function fwb_redirect_to_landing_init() {
     <tr>
     <th scope="row"><label for="enableredirect">Enable Redirect</label></th>
     <td><input name="enableredirect" type="checkbox" id="enableredirect" value="1"'.($enableredirect_option ? ' checked' : false).'/> Check to enable.</td>
+    </tr>
+
+    <tr>
+    <th><label for="redirecttype"> Redirection Type</label></th>
+    <td>
+        <select name="redirecttype">
+            <option value="302"' . selected($redirecttype_option, 302, false) . '>Temporary redirect (302)</option>
+            <option value="301"' . selected($redirecttype_option, 301, false) . '>Permanent redirect (301)</option>
+        </select>
+    </td>
     </tr>
     
     <tr>
