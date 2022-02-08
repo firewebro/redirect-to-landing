@@ -72,11 +72,6 @@ function fwb_redirect_to_landing_init() {
 
     global $wp_roles;
 
-    // print it to the screen
-    echo '<pre>' . print_r( $_POST['rolebypass'], true ) . '</pre>';
-
-
-
     // display plugin page
     echo '
     <div class="wrap">
@@ -108,8 +103,6 @@ function fwb_redirect_to_landing_init() {
     $redirecturl_option = get_option('fwb_redirect_to_landing_url', false);
     $rolebypass_option = get_option('fwb_redirect_to_landing_rolebypass', false);
     $redirecttype_option = get_option( 'fwb_redirect_type', false );
-
-     echo '<pre>' . print_r( $rolebypass_option, true ) . '</pre>';
 
     echo '<form method="post" action=""> 
     <table class="form-table">
