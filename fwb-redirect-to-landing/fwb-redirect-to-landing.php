@@ -17,11 +17,12 @@ if( !function_exists("fwb_redirect_to_landing") ){
         $enableredirect_option = get_option('fwb_redirect_to_landing_enable', false);
         $redirecturl_option = get_option('fwb_redirect_to_landing_url', false);
         $redirecttype_option = get_option( 'fwb_redirect_type', 302 );
+        $rolebypass_option = get_option('fwb_redirect_to_landing_rolebypass', false);
         // verify redirecturl against post_name to avoit a redirection loop, possible more bugs here
         if( !strpos($redirecturl_option, get_post_field('post_name', get_post())) ) {
             if( $enableredirect_option && strlen($redirecturl_option) > 10 ) {
                 // admins are not redirected
-                if( !current_user_can( 'administrator' ) && !is_admin() ){
+                if( !fwb_redirect_to_landing_check_role( $rolebypass_option ) ){
                     // do the redirect 
                     header( "Location: ". $redirecturl_option, true, $redirecttype_option );
                     // exit to stop execution after header()
@@ -30,6 +31,23 @@ if( !function_exists("fwb_redirect_to_landing") ){
             }
         }
     }
+}
+
+function fwb_redirect_to_landing_check_role($roles, $user_id = null) {
+    if ($user_id) {
+        $user = get_userdata($user_id);
+    } else {
+        $user = wp_get_current_user();
+    }
+    if (empty($user)) {
+        return false;
+    }
+    foreach ($user->roles as $role) {
+        if (in_array($role, $roles)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // hook redirect
@@ -52,6 +70,8 @@ function fwb_redirect_to_landing_init() {
 	}
     $plugin_data = get_plugin_data( __FILE__ );
 
+    global $wp_roles;
+
     // display plugin page
     echo '
     <div class="wrap">
@@ -68,6 +88,10 @@ function fwb_redirect_to_landing_init() {
             delete_option('fwb_redirect_to_landing_url');
             add_option('fwb_redirect_to_landing_url', esc_url_raw($_POST['redirecturl']), '', 'yes' );
         }
+        if( isset($_POST['rolebypass']) ){
+            delete_option('fwb_redirect_to_landing_rolebypass');
+            add_option('fwb_redirect_to_landing_rolebypass', $_POST['rolebypass'], '', 'no' );
+        }
         //redirect type option
         if( isset($_POST['redirecttype']) ){
             delete_option('fwb_redirect_type');
@@ -77,6 +101,7 @@ function fwb_redirect_to_landing_init() {
 
     $enableredirect_option = get_option('fwb_redirect_to_landing_enable', false);
     $redirecturl_option = get_option('fwb_redirect_to_landing_url', false);
+    $rolebypass_option = get_option('fwb_redirect_to_landing_rolebypass', false);
     $redirecttype_option = get_option( 'fwb_redirect_type', false );
 
     echo '<form method="post" action=""> 
@@ -94,6 +119,17 @@ function fwb_redirect_to_landing_init() {
             <option value="302"' . selected($redirecttype_option, 302, false) . '>Temporary redirect (302)</option>
             <option value="301"' . selected($redirecttype_option, 301, false) . '>Permanent redirect (301)</option>
         </select>
+    </td>
+    </tr>
+
+    <tr>
+    <th><label for="rolebypass"> Role Bypass</label></th>
+    <td>
+        <select name="rolebypass[]" multiple>';
+            foreach($wp_roles->roles as $role => $roledetails) {
+                echo '<option value="'.$role.'"' . selected(in_array($role, $rolebypass_option), true, false) . '>'.$role.'</option>';
+            }
+    echo '    </select>
     </td>
     </tr>
     
