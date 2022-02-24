@@ -19,8 +19,8 @@ if( !function_exists("fwb_redirect_to_landing") ){
         $redirecttype_option = get_option( 'fwb_redirect_type', 302 );
         $rolebypass_option = get_option('fwb_redirect_to_landing_rolebypass', false);
         // verify redirecturl against post_name to avoit a redirection loop, possible more bugs here
-        if( !strpos($redirecturl_option, get_post_field('post_name', get_post())) ) {
-            if( $enableredirect_option && strlen($redirecturl_option) > 10 ) {
+        if( $enableredirect_option && strlen($redirecturl_option) > 10 ) {
+            if( !strpos($redirecturl_option, get_post_field('post_name', get_post())) ) {
                 // admins are not redirected
                 if( !fwb_redirect_to_landing_check_role( $rolebypass_option ) ){
                     // do the redirect 
