@@ -74,8 +74,6 @@ function fwb_redirect_to_landing_init() {
 	}
     $plugin_data = get_plugin_data( __FILE__ );
 
-    global $wp_roles;
-
     // display plugin page
     echo '
     <div class="wrap">
@@ -105,7 +103,7 @@ function fwb_redirect_to_landing_init() {
 
     $enableredirect_option = get_option('fwb_redirect_to_landing_enable', false);
     $redirecturl_option = get_option('fwb_redirect_to_landing_url', false);
-    $rolebypass_option = get_option('fwb_redirect_to_landing_rolebypass', false);
+    $rolebypass_option = get_option('fwb_redirect_to_landing_rolebypass', ['adminsitrator']);
     $redirecttype_option = get_option( 'fwb_redirect_type', false );
 
     echo '<form method="post" action=""> 
@@ -130,7 +128,7 @@ function fwb_redirect_to_landing_init() {
     <th><label for="rolebypass"> Role Bypass</label></th>
     <td>
         <select name="rolebypass[]" multiple>';
-            foreach($wp_roles->roles as $role => $roledetails) {
+            foreach(wp_roles()->roles as $role => $roledetails) {
                 echo '<option value="'.$role.'"' . selected(in_array($role, $rolebypass_option), true, false) . '>'.$role.'</option>';
             }
     echo '    </select>
