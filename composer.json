@@ -1,0 +1,21 @@
+{
+	"name": "fireweb/fwb-redirect-to-landing",
+	"description": "WordPress plugin that redirects public traffic to a landing page.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^9.6",
+		"yoast/phpunit-polyfills": "^2.0"
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"FwbRedirectToLanding\\Tests\\": "tests/"
+		}
+	},
+	"scripts": {
+		"test": "phpunit"
+	}
+}
